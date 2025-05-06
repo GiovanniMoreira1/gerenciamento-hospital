@@ -1,5 +1,6 @@
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
 
     typedef struct {
         int dia;
@@ -38,11 +39,11 @@
     void mostrarLista(Lista *lista) {
         Elista *atual = lista->inicio;
         while(atual != NULL) {
+            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             printf("Nome: %s \n", &atual->dados->nome);
             printf("Idade: %d \n", atual->dados->idade);
             printf("RG: %s \n", atual->dados->rg);
             printf("Data: %d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes ,atual->dados->entrada->ano );
-            printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             atual = atual->proximo;
         }
         printf("\n");
@@ -90,6 +91,39 @@
     
     }
 
+    void consultar_ultimo_paciente(Lista *lista) {
+        Elista *atual = lista->inicio;
+
+        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("Nome: %s \n", &atual->dados->nome);
+        printf("Idade: %d \n", atual->dados->idade);
+        printf("RG: %s \n", atual->dados->rg);
+        printf("Data: %d/%d/%d \n", atual->dados->entrada->dia,     atual->dados->entrada->mes ,atual->dados->entrada->ano );
+        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+    }
+
+    void remover_paciente(Lista *lista, char rg[9]) {
+        Elista *anterior = NULL;
+        Elista *atual = lista->inicio;
+
+        while(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
+            anterior = atual;
+            atual = atual->proximo;
+        }
+        if(atual == NULL) {
+            return;
+        }
+        if(anterior == NULL) {
+            lista->inicio = atual->proximo;
+        } else {
+            anterior->proximo = atual->proximo;
+        }
+        free(atual->dados->entrada);
+        free(atual->dados);
+        printf("Paciente removido com sucesso!");
+        lista->qntd--;
+    }
+
 
     void cadastro(Lista *lista) {
 
@@ -97,13 +131,13 @@
         while(opcao != 6) {
             printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             printf("| 1. Cadastrar paciente           |\n");
-            printf("| 2. Consultar paciente cadastrado|\n");
+            printf("| 2. Consultar último paciente    |\n");
             printf("| 3. Listar pacientes             |\n");
             printf("| 4. Alterar dados do paciente    |\n");
             printf("| 5. Excluir paciente             |\n");
             printf("| 6. Voltar                       |\n");
             printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-            printf("\nEscolha uma opção: \n");
+            printf("\nEscolha uma opção: ");
             scanf("%d", &opcao);
 
             switch(opcao) {
@@ -124,7 +158,7 @@
                     cadastrar_paciente(lista, registro);
                     break;
                 case 2:
-                    
+                    consultar_ultimo_paciente(lista);
                     break;
                 case 3:
                     mostrarLista(lista);
@@ -133,7 +167,10 @@
                     
                     break;
                 case 5:
-                    
+                    char rg[9];
+                    printf("RG do paciente a ser removido: ");
+                    scanf("%s", rg);
+                    remover_paciente(lista, rg);
                     break;
                 case 6:
                     printf("Voltando...\n");
