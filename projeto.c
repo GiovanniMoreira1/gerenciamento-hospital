@@ -15,7 +15,7 @@
         Data *entrada;
     } Registro;
 
-    typedef struct {
+    typedef struct Elista {
         Registro *dados;
         struct Elista *proximo;
     } Elista; // celula LDE
@@ -36,11 +36,16 @@
         int qntd;
     } Fila;
 
+    void limpar_buffer() {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF) {}
+    }
+
     void mostrarLista(Lista *lista) {
         Elista *atual = lista->inicio;
         while(atual != NULL) {
             printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-            printf("Nome: %s \n", &atual->dados->nome);
+            printf("Nome: %s \n", atual->dados->nome);
             printf("Idade: %d \n", atual->dados->idade);
             printf("RG: %s \n", atual->dados->rg);
             printf("Data: %d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes ,atual->dados->entrada->ano );
@@ -95,7 +100,7 @@
         Elista *atual = lista->inicio;
 
         printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-        printf("Nome: %s \n", &atual->dados->nome);
+        printf("Nome: %s \n", atual->dados->nome);
         printf("Idade: %d \n", atual->dados->idade);
         printf("RG: %s \n", atual->dados->rg);
         printf("Data: %d/%d/%d \n", atual->dados->entrada->dia,     atual->dados->entrada->mes ,atual->dados->entrada->ano );
@@ -124,11 +129,39 @@
         lista->qntd--;
     }
 
+    void atualizar_paciente(Lista *lista, char rg[9]) {
+        Elista *anterior = NULL;
+        Elista *atual = lista->inicio;
+
+        while(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
+            anterior = atual;
+            atual = atual->proximo;
+        }
+        if(atual == NULL) {
+            printf("Erro - Paciente não encontrado.\n");
+            return;
+        } else {
+            printf("Atualizando dados do usuário\n");
+            printf("Nome do paciente: ");
+            scanf("%s", atual->dados->nome);
+            limpar_buffer();
+            printf("Idade do paciente: ");
+            scanf("%d", &atual->dados->idade);
+            limpar_buffer();
+            printf("RG do paciente: ");
+            scanf("%s", atual->dados->rg);
+            limpar_buffer();
+            printf("\nUsuário atualizado com sucesso!");
+        }
+
+    }
 
     void cadastro(Lista *lista) {
-
+        char rg[9];
         int opcao = 0;
         while(opcao != 6) {
+            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            printf("|     Cadastro de Pacientes       |    ");
             printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             printf("| 1. Cadastrar paciente           |\n");
             printf("| 2. Consultar último paciente    |\n");
@@ -141,15 +174,18 @@
             scanf("%d", &opcao);
 
             switch(opcao) {
-                case 1:
+                case 1: {
                     Registro *registro = malloc(sizeof(Registro));
 
                     printf("Nome do paciente: ");
                     scanf("%s", registro->nome);
+                    limpar_buffer();
                     printf("Idade do paciente: ");
                     scanf("%d", &registro->idade);
+                    limpar_buffer();
                     printf("RG do paciente: ");
                     scanf("%s", registro->rg);
+                    limpar_buffer();
                     registro->entrada = malloc(sizeof(Data));
                 
                     printf("Data (dd mm aaaa): ");
@@ -157,6 +193,7 @@
 
                     cadastrar_paciente(lista, registro);
                     break;
+                }   
                 case 2:
                     consultar_ultimo_paciente(lista);
                     break;
@@ -164,10 +201,11 @@
                     mostrarLista(lista);
                     break;
                 case 4:
-                    
+                    printf("RG do paciente que deseja alterar: ");
+                    scanf("%s", rg);
+                    atualizar_paciente(lista, rg);
                     break;
                 case 5:
-                    char rg[9];
                     printf("RG do paciente a ser removido: ");
                     scanf("%s", rg);
                     remover_paciente(lista, rg);
@@ -240,16 +278,18 @@
         
         int opc = 0;
         while(opc != 8){
-            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-            printf("| 1. Cadastrar paciente           |\n");
-            printf("| 2. Atendimento                  |\n");   
-            printf("| 3. Atendimento prioritário      |\n");
-            printf("| 4. Pesquisar                    |\n");
-            printf("| 5. Desfazer                     |\n");
-            printf("| 6. Carregar / Salvar            |\n");
-            printf("| 7. Sobre                        |\n");
-            printf("| 8. Sair                         |\n");
-            printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            printf("|  Gerenciador de Sistema de Saúde  |");
+            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            printf("| 1. Cadastrar paciente             |\n");
+            printf("| 2. Atendimento                    |\n");   
+            printf("| 3. Atendimento prioritário        |\n");
+            printf("| 4. Pesquisar                      |\n");
+            printf("| 5. Desfazer                       |\n");
+            printf("| 6. Carregar / Salvar              |\n");
+            printf("| 7. Sobre                          |\n");
+            printf("| 8. Sair                           |\n");
+            printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             printf("\nEscolha uma opção: ");
             scanf("%d", &opc);
 
