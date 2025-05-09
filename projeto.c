@@ -25,12 +25,12 @@
         int qntd;
     } Lista; // LDE
 
-    typedef struct {
+    typedef struct Efila {
         Registro *dados;
-        struct Efila *proximoimo;
+        struct Efila *proximo;
     } Efila;
 
-    typedef struct {
+    typedef struct Fila {
         Efila *head;
         Efila *tail;
         int qntd;
@@ -219,10 +219,71 @@
         }
     }
 
+    Fila* criar_fila() {
+        Fila *nova_fila = malloc(sizeof(Fila));
+        nova_fila->head = NULL;
+        nova_fila->tail = NULL;
+        nova_fila->qntd = 0;
 
-    void atendimento() {
+        return nova_fila;
+    }
+
+    void enqueue_paciente(Fila *queue, Registro *dados) {
+        
+        Efila *nova = malloc(sizeof(Efila));
+        nova->proximo = NULL;
+        nova->dados = dados;
+
+        if(queue->qntd == 0) {
+            queue->head = nova;
+        } else {
+            queue->tail->proximo = nova;
+        }
+        queue->tail = nova;
+        queue->qntd++;
+    }
+    
+
+   void dequeue_paciente(Fila *queue) {
+        if(queue->qntd == 0) {
+            return;
+        }
+        Efila *liberar = queue->head;
+        
+        if(queue->qntd == 1) {
+            queue->head = NULL;
+            queue->tail = NULL;
+
+        } else {
+            queue->head = queue->head->proximo;
+        }
+        queue->qntd--;
+
+        free(liberar);
+    }
+
+    void mostrar_queue(Fila *q) {
+       Efila *i = q->head;
+       int cont = 0;
+        while(i != NULL) {
+            cont++;
+            printf("%d - Nome: %s | RG: %s \n", cont, i->dados->nome, i->dados->rg);
+            i = i->proximo;
+        }
+        printf("\n");
+    }
+
+
+
+// precisa ver com o professor se pode fazer assim, pq na teoria, o paciente seria cadastrado e já colocado na fila, entao o enqueue iria sempre pegar o primeiro registro da LDE (que eh o mais recente) e enfileirar
+
+
+    void atendimento(Fila *fila, Lista *lista) {
         int opc = 0;
+        
         while(opc != 4) {
+            printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+            printf("|             Atendimento           |");
             printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
             printf("| 1. Enfileirar paciente            |\n");
             printf("| 2. Desenfileirar paciente         |\n");
@@ -234,13 +295,13 @@
 
             switch(opc) {
                 case 1:
-                    
+                    enqueue_paciente(fila, lista->inicio->dados);
                     break;
                 case 2:
-                    
+                    dequeue_paciente(fila);
                     break;
                 case 3:
-                    
+                    mostrar_queue(fila);
                     break;
                 case 4:
                     printf("Voltando...\n");
@@ -272,6 +333,7 @@
     }
 
     void menu() {
+        Fila *fila = criar_fila();
         Lista *lista = malloc(sizeof(Lista));
         lista->inicio = NULL;
         lista->qntd = 0;
@@ -298,7 +360,7 @@
                     cadastro(lista);
                     break;
                 case 2:
-                    atendimento();
+                    atendimento(fila, lista);
                     break;
                 case 3:
                     atendimento_prioritario();
