@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "lista.h"
 #include "fila.h"
+#include "heap.h"
 
 void limpar_buffer() {
     int c;
@@ -130,15 +131,78 @@ void atendimento(Fila *fila, Lista *lista) {
     }
 }
 
+void atendimento_prioritario(HeapMaximo* heap, Lista* lista) {
+    int opcao = 0;
+    while(opcao != 6) {
+        printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("|   Atendimento Prioritário       |    ");
+        printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("| 1. Enfileirar paciente          |\n");
+        printf("| 2. Desenfileirar paciente       |\n");
+        printf("| 3. Realizar atendimento         |\n");
+        printf("| 4. Mostrar fila prioritária     |\n");
+        printf("| 5. Próximo atendimento          |\n");
+        printf("| 6. Voltar                       |\n");
+        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("\nEscolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch(opcao) {
+            case 1: {
+                char rg[9];
+                printf("RG do paciente: ");
+                scanf("%s", rg);
+                enfileirarPaciente(heap, lista, rg);
+                confirma();
+                break;
+            }
+            case 2: {
+                char rg[9];
+                printf("RG do paciente para desenfileirar: ");
+                scanf("%s", rg);
+                desenfileirarPaciente(heap, rg);
+                confirma();
+                break;
+            }
+            case 3: {
+                if(heapVazio(heap)) {
+                    printf("Não há pacientes na fila prioritária!\n");
+                } else {
+                    Registro* paciente = removerPaciente(heap);
+                    printf("\nAtendendo paciente prioritário:\n");
+                    printf("Nome: %s\n", paciente->nome);
+                    printf("Idade: %d\n", paciente->idade);
+                    printf("RG: %s\n", paciente->rg);
+                }
+                confirma();
+                break;
+            }
+            case 4:
+                imprimirHeap(heap);
+                confirma();
+                break;
+            case 5:
+                imprimirProximoAtendimento(heap);
+                confirma();
+                break;
+            case 6:
+                printf("Voltando...\n");
+                break;
+        }
+    }
+}
+
 void menu() {
-    Lista *lista = malloc(sizeof(Lista));
+    Lista* lista = malloc(sizeof(Lista));
     lista->inicio = NULL;
     lista->qntd = 0;
 
-    Fila *fila = malloc(sizeof(Fila));
+    Fila* fila = malloc(sizeof(Fila));
     fila->head = NULL;
     fila->tail = NULL;
     fila->qntd = 0;
+
+    HeapMaximo* heap = criarHeap();
 
     int opcao = 0;
     while(opcao != 7) {
@@ -164,8 +228,7 @@ void menu() {
                 atendimento(fila, lista);
                 break;
             case 3:
-                printf("Funcionalidade em desenvolvimento...\n");
-                confirma();
+                atendimento_prioritario(heap, lista);
                 break;
             case 4:
                 printf("Funcionalidade em desenvolvimento...\n");
@@ -175,12 +238,46 @@ void menu() {
                 printf("Funcionalidade em desenvolvimento...\n");
                 confirma();
                 break;
-            case 6:
-                printf("Funcionalidade em desenvolvimento...\n");
-                confirma();
+            case 6: {
+                int subopcao = 0;
+                while(subopcao != 3) {
+                    printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+                    printf("|     Carregar/Salvar Dados       |    ");
+                    printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+                    printf("| 1. Carregar dados               |\n");
+                    printf("| 2. Salvar dados                 |\n");
+                    printf("| 3. Voltar                       |\n");
+                    printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+                    printf("\nEscolha uma opção: ");
+                    scanf("%d", &subopcao);
+
+                    switch(subopcao) {
+                        case 1: {
+                            char nomeArquivo[100];
+                            printf("Nome do arquivo para carregar: ");
+                            scanf("%s", nomeArquivo);
+                            carregarLista(lista, nomeArquivo);
+                            confirma();
+                            break;
+                        }
+                        case 2: {
+                            char nomeArquivo[100];
+                            printf("Nome do arquivo para salvar: ");
+                            scanf("%s", nomeArquivo);
+                            salvarLista(lista, nomeArquivo);
+                            confirma();
+                            break;
+                        }
+                        case 3:
+                            printf("Voltando...\n");
+                            break;
+                    }
+                }
                 break;
+            }
             case 7:
                 printf("Saindo...\n");
+                destruirHeap(heap);
                 break;
         }
     }

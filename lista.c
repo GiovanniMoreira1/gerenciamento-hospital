@@ -133,4 +133,72 @@ void atualizar_paciente(Lista *lista) {
         limpar_buffer();
         printf("\nUsuário atualizado com sucesso!");
     }
+}
+
+void salvarLista(Lista* lista, const char* nomeArquivo) {
+    FILE* arquivo = fopen(nomeArquivo, "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para escrita!\n");
+        return;
+    }
+
+    Elista* atual = lista->inicio;
+    while (atual != NULL) {
+        // Escreve os dados do paciente no arquivo
+        fprintf(arquivo, "%s %d %s %d %d %d\n",
+                atual->dados->nome,
+                atual->dados->idade,
+                atual->dados->rg,
+                atual->dados->entrada->dia,
+                atual->dados->entrada->mes,
+                atual->dados->entrada->ano);
+        
+        atual = atual->proximo;
+    }
+
+    fclose(arquivo);
+    printf("Lista salva com sucesso no arquivo %s!\n", nomeArquivo);
+}
+
+void carregarLista(Lista* lista, const char* nomeArquivo) {
+    FILE* arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para leitura!\n");
+        return;
+    }
+
+    // Limpa a lista atual
+    while (lista->inicio != NULL) {
+        Elista* temp = lista->inicio;
+        lista->inicio = lista->inicio->proximo;
+        free(temp->dados->entrada);
+        free(temp->dados);
+        free(temp);
+    }
+    lista->qntd = 0;
+
+    char nome[50];
+    int idade;
+    char rg[9];
+    int dia, mes, ano;
+
+    // Lê os dados do arquivo e insere na lista
+    while (fscanf(arquivo, "%s %d %s %d %d %d",
+                  nome, &idade, rg, &dia, &mes, &ano) == 6) {
+        
+        Registro* novoRegistro = malloc(sizeof(Registro));
+        novoRegistro->entrada = malloc(sizeof(Data));
+        
+        strcpy(novoRegistro->nome, nome);
+        novoRegistro->idade = idade;
+        strcpy(novoRegistro->rg, rg);
+        novoRegistro->entrada->dia = dia;
+        novoRegistro->entrada->mes = mes;
+        novoRegistro->entrada->ano = ano;
+
+        cadastrar_paciente(lista, novoRegistro);
+    }
+
+    fclose(arquivo);
+    printf("Lista carregada com sucesso do arquivo %s!\n", nomeArquivo);
 } 
