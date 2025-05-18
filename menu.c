@@ -3,6 +3,7 @@
 #include "lista.h"
 #include "fila.h"
 #include "heap.h"
+#include "arvore.h"
 
 void limpar_buffer() {
     int c;
@@ -16,11 +17,6 @@ void confirma() {
     printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
     limpar_buffer();
     fgets(input, sizeof(input), stdin);
-    if(strcmp(input, "\n") == 0 || sizeof(input) >= 0) {
-        return;
-    } else {
-        confirma();
-    }
 }
 
 void sobre() {
@@ -95,7 +91,7 @@ void cadastro(Lista *lista, Contexto *c) {
                 atualizar_paciente(lista);
                 confirma();
                 break;
-            case 5:
+            case 5: {
                 char rg[9];
                 printf("RG do paciente a ser removido: ");
                 scanf("%s", rg);
@@ -106,6 +102,7 @@ void cadastro(Lista *lista, Contexto *c) {
                 limpar_buffer();
                 confirma();
                 break;
+            }
             case 6:
                 printf("Voltando...\n");
                 break;
@@ -221,6 +218,120 @@ void atendimento_prioritario(HeapMaximo* heap, Lista* lista) {
     }
 }
 
+// Função auxiliar para buscar paciente na lista pelo RG
+static Registro* buscar_paciente_na_lista(Lista* lista, const char* rg) {
+    Elista* atual = lista->inicio;
+    while (atual != NULL) {
+        if (strcmp(atual->dados->rg, rg) == 0) {
+            return atual->dados;
+        }
+        atual = atual->proximo;
+    }
+    return NULL;
+}
+
+void menu_busca(Lista* lista) {
+    static ABB* arvore = NULL;
+    if (arvore == NULL) {
+        arvore = criar_abb();
+    }
+    int opcao = 0;
+    while (opcao != 6) {
+        printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("|         Menu de Pesquisa         |\n");
+        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("| 1. Inserir paciente na árvore   |\n");
+        printf("| 2. Mostrar por ano de registro  |\n");
+        printf("| 3. Mostrar por mês de registro  |\n");
+        printf("| 4. Mostrar por dia de registro  |\n");
+        printf("| 5. Mostrar por idade            |\n");
+        printf("| 6. Voltar                      |\n");
+        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf("\nEscolha uma opção: ");
+        scanf("%d", &opcao);
+        limpar_buffer();
+        switch(opcao) {
+            case 1: {
+                char rg[9];
+                printf("RG do paciente para inserir na árvore: ");
+                scanf("%s", rg);
+                limpar_buffer();
+                Elista *atual = lista->inicio;
+                while(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
+                    atual = atual->proximo;
+                }
+                if (atual != NULL) {
+                    inserir_abb(arvore, atual->dados);
+                    printf("Paciente inserido na árvore de busca!\n");
+                } else {
+                    printf("Paciente não encontrado!\n");
+                }
+                confirma();
+                break;
+            }
+            case 2: {
+                if (arvore->raiz == NULL) {
+                    printf("Árvore vazia!\n");
+                } else {
+                    ABB* temp = criar_abb();
+                    inserir_todos_ano(arvore->raiz, temp);
+                    int count = 1;
+                    printf("\n--- Pacientes ordenados por ANO de registro ---\n");
+                    mostrar_por_ano(temp->raiz, &count);
+                    liberar_abb(temp);
+                }
+                confirma();
+                break;
+            }
+            case 3: {
+                if (arvore->raiz == NULL) {
+                    printf("Árvore vazia!\n");
+                } else {
+                    ABB* temp = criar_abb();
+                    inserir_todos_mes(arvore->raiz, temp);
+                    int count = 1;
+                    printf("\n--- Pacientes ordenados por MÊS de registro ---\n");
+                    mostrar_por_mes(temp->raiz, &count);
+                    liberar_abb(temp);
+                }
+                confirma();
+                break;
+            }
+            case 4: {
+                if (arvore->raiz == NULL) {
+                    printf("Árvore vazia!\n");
+                } else {
+                    ABB* temp = criar_abb();
+                    inserir_todos_dia(arvore->raiz, temp);
+                    int count = 1;
+                    printf("\n--- Pacientes ordenados por DIA de registro ---\n");
+                    mostrar_por_dia(temp->raiz, &count);
+                    liberar_abb(temp);
+                }
+                confirma();
+                break;
+            }
+            case 5: {
+                if (arvore->raiz == NULL) {
+                    printf("Árvore vazia!\n");
+                } else {
+                    ABB* temp = criar_abb();
+                    inserir_todos_idade(arvore->raiz, temp);
+                    int count = 1;
+                    printf("\n--- Pacientes ordenados por IDADE ---\n");
+                    mostrar_por_idade(temp->raiz, &count);
+                    liberar_abb(temp);
+                }
+                confirma();
+                break;
+            }
+            case 6:
+                printf("Voltando...\n");
+                break;
+        }
+    }
+}
+
 void menu() {
     Lista* lista = malloc(sizeof(Lista));
     lista->inicio = NULL;
@@ -266,8 +377,7 @@ void menu() {
                 atendimento_prioritario(heap, lista);
                 break;
             case 4:
-                printf("Funcionalidade em desenvolvimento...\n");
-                confirma();
+                menu_busca(lista);
                 break;
             case 5:
                 desfazer_ultima_operacao(c);
