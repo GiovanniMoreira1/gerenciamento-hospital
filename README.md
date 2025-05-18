@@ -74,3 +74,6 @@ Maria 32 456 10 2 2023
 
 ---
 Desenvolvido para a disciplina de Estrutura de Dados - Ciência da Computação - FEI
+Alunos:
+   Artur Chaves Paiva - 22.223.023-7
+   Giovanni Antonio Moreira - 22.223.010-4
