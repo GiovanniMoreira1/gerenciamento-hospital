@@ -23,7 +23,21 @@ void confirma() {
     }
 }
 
-void cadastro(Lista *lista) {
+void sobre() {
+    printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
+    printf("| Nome dos desenvolvedores:                |\n");
+    printf("| Artur Chaves Paiva - 22.223.023-7        |\n");
+    printf("| Giovanni Antonio Moreira - 22.223.010-4  |\n");
+    printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-|\n");
+    printf("| Curso: Ciência da Computação - 4 Ciclo   |\n");
+    printf("| Disciplina: Estrutura de Dados           |\n");
+    printf("| Data: ?                                  |\n");
+    printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    confirma();
+}
+
+void cadastro(Lista *lista, Contexto *c) {
+    Operacao op;
     int opcao = 0;
     while(opcao != 6) {
         printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
@@ -58,6 +72,14 @@ void cadastro(Lista *lista) {
                 scanf("%d %d %d", &registro->entrada->dia, &registro->entrada->mes, &registro->entrada->ano);
 
                 cadastrar_paciente(lista, registro);
+                
+                op.tipo = OP_CADASTRO;
+                op.registro = *registro; 
+
+                op.registro.entrada = malloc(sizeof(Data));
+                *(op.registro.entrada) = *(registro->entrada);
+
+                empilhar(c->pilha_operacoes, op);
                 confirma();
                 break;
             }   
@@ -74,7 +96,14 @@ void cadastro(Lista *lista) {
                 confirma();
                 break;
             case 5:
-                remover_paciente(lista);
+                char rg[9];
+                printf("RG do paciente a ser removido: ");
+                scanf("%s", rg);
+                remover_paciente(lista, rg);
+                
+                op.tipo = OP_REMOCAO;
+                empilhar(c->pilha_operacoes, op);
+                limpar_buffer();
                 confirma();
                 break;
             case 6:
@@ -204,6 +233,11 @@ void menu() {
 
     HeapMaximo* heap = criarHeap();
 
+    Contexto* c = malloc(sizeof(Contexto));
+    c->lista_pacientes = lista;
+    c->fila_pacientes = fila;
+    c->pilha_operacoes = criar_pilha();
+
     int opcao = 0;
     while(opcao != 7) {
         printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
@@ -214,15 +248,16 @@ void menu() {
         printf("| 3. Atendimento Prioritário     |\n");
         printf("| 4. Pesquisa                    |\n");
         printf("| 5. Desfazer                    |\n");
-        printf("| 6. Carregar/Salvar            |\n");
-        printf("| 7. Sair                        |\n");
+        printf("| 6. Carregar/Salvar             |\n");
+        printf("| 7. Sobre                       |\n");
+        printf("| 8. Sair                        |\n");
         printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
         printf("\nEscolha uma opção: ");
         scanf("%d", &opcao);
 
         switch(opcao) {
             case 1:
-                cadastro(lista);
+                cadastro(lista, c);
                 break;
             case 2:
                 atendimento(fila, lista);
@@ -235,7 +270,7 @@ void menu() {
                 confirma();
                 break;
             case 5:
-                printf("Funcionalidade em desenvolvimento...\n");
+                desfazer_ultima_operacao(c);
                 confirma();
                 break;
             case 6: {
@@ -276,6 +311,9 @@ void menu() {
                 break;
             }
             case 7:
+                sobre();
+                break;
+            case 8:
                 printf("Saindo...\n");
                 destruirHeap(heap);
                 break;

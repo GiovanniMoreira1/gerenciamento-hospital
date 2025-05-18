@@ -18,6 +18,30 @@ typedef struct {
     Data *entrada;
 } Registro;
 
+
+typedef enum {
+    OP_CADASTRO,
+    OP_REMOCAO,
+    OP_ENFILEIRAR,
+    OP_DESINFILEIRAR
+    // adicionar conforme for usar no desfazer
+} TipoOperacao;
+
+typedef struct Operacao {
+    TipoOperacao tipo;
+    Registro registro;  // Cópia do paciente envolvido
+} Operacao;
+
+typedef struct E_pilha {
+    Operacao operacao;
+    struct E_pilha* proximo;
+} E_pilha;
+
+typedef struct Pilha {
+    E_pilha* topo;
+    int tamanho;
+} Pilha;
+
 typedef struct Elista {
     Registro *dados;
     struct Elista *proximo;
@@ -38,6 +62,12 @@ typedef struct Fila {
     Efila *tail;
     int qntd;
 } Fila;
+
+typedef struct {
+    Lista* lista_pacientes;
+    Fila* fila_pacientes;
+    Pilha* pilha_operacoes;
+} Contexto;
 
 // Funções utilitárias
 void limpar_buffer();

@@ -72,8 +72,7 @@ void consultar_ultimo_paciente(Lista *lista) {
     }
 }
 
-void remover_paciente(Lista *lista) {
-    char rg[9];
+void remover_paciente(Lista *lista, char rg[9]) {
     Elista *anterior = NULL;
     Elista *atual = lista->inicio;
     
@@ -81,9 +80,6 @@ void remover_paciente(Lista *lista) {
         printf("\nAinda não há pacientes cadastrados.");
         return;
     }
-
-    printf("RG do paciente a ser removido: ");
-    scanf("%s", rg);
 
     while(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
         anterior = atual;
@@ -136,7 +132,7 @@ void atualizar_paciente(Lista *lista) {
 }
 
 void salvarLista(Lista* lista, const char* nomeArquivo) {
-    FILE* arquivo = fopen(nomeArquivo, "w");
+    FILE* arquivo = fopen(nomeArquivo, "a"); // append pra não sobrescrever
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo para escrita!\n");
         return;
