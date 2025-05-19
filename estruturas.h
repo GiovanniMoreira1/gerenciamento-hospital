@@ -1,5 +1,9 @@
 #ifndef ESTRUTURAS_H
 #define ESTRUTURAS_H
+#define RESET       "\033[0m"
+#define RED         "\033[0;31m"
+#define GREEN       "\033[0;32m"
+#define LIGHT_BLUE  "\033[1;34m"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +27,7 @@ typedef enum {
     OP_CADASTRO,
     OP_REMOCAO,
     OP_ENFILEIRAR,
-    OP_DESINFILEIRAR
+    OP_DESENFILEIRAR
     // adicionar conforme for usar no desfazer
 } TipoOperacao;
 

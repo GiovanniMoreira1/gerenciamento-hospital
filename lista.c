@@ -4,14 +4,17 @@
 void mostrarLista(Lista *lista) {
     Elista *atual = lista->inicio;
     if(atual == NULL) { 
+        printf(RED);
         printf("\nAinda não há pacientes cadastrados.");
     }
     while(atual != NULL) {
+        printf(LIGHT_BLUE);
         printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-        printf("Nome: %s \n", atual->dados->nome);
-        printf("Idade: %d \n", atual->dados->idade);
-        printf("RG: %s \n", atual->dados->rg);
-        printf("Data: %d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes ,atual->dados->entrada->ano );
+        printf(LIGHT_BLUE "Nome: " RESET "%s \n", atual->dados->nome);
+        printf(LIGHT_BLUE "Idade: " RESET "%d \n", atual->dados->idade);
+        printf(LIGHT_BLUE "RG: " RESET "%s \n", atual->dados->rg);
+        printf(LIGHT_BLUE "Data: " RESET "%d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes, atual->dados->entrada->ano);
+        printf(RESET);
         atual = atual->proximo;
     }
     printf("\n");
@@ -61,14 +64,16 @@ void cadastrar_paciente(Lista *lista, Registro *registro) {
 void consultar_ultimo_paciente(Lista *lista) {
     Elista *atual = lista->inicio;
     if(atual == NULL) {
+        printf(RED);
         printf("\nAinda não há pacientes cadastrados.");
     } else {
-        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-        printf("Nome: %s \n", atual->dados->nome);
-        printf("Idade: %d \n", atual->dados->idade);
-        printf("RG: %s \n", atual->dados->rg);
-        printf("Data: %d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes ,atual->dados->entrada->ano );
-        printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf(LIGHT_BLUE);
+        printf("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+        printf(LIGHT_BLUE "Nome: " RESET "%s \n", atual->dados->nome);
+        printf(LIGHT_BLUE "Idade: " RESET "%d \n", atual->dados->idade);
+        printf(LIGHT_BLUE "RG: " RESET "%s \n", atual->dados->rg);
+        printf(LIGHT_BLUE "Data: " RESET "%d/%d/%d \n", atual->dados->entrada->dia, atual->dados->entrada->mes, atual->dados->entrada->ano);
+        printf(LIGHT_BLUE"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
     }
 }
 
@@ -77,6 +82,7 @@ void remover_paciente(Lista *lista, char rg[9]) {
     Elista *atual = lista->inicio;
     
     if(atual == NULL) {
+        printf(RED);
         printf("\nAinda não há pacientes cadastrados.");
         return;
     }
@@ -92,7 +98,9 @@ void remover_paciente(Lista *lista, char rg[9]) {
     }
     free(atual->dados->entrada);
     free(atual->dados);
-    printf("Paciente removido com sucesso!");
+    free(atual);
+    printf(GREEN);
+    printf("Paciente %s removido com sucesso!", atual->dados->nome);
     lista->qntd--;
 }
 
@@ -102,31 +110,46 @@ void atualizar_paciente(Lista *lista) {
     Elista *atual = lista->inicio;
 
     if(atual == NULL) {
+        printf(RED);
         printf("\nAinda não há pacientes cadastrados.");
         return;
     }
 
-    printf("RG do paciente a ser removido: ");
+    printf(LIGHT_BLUE);
+    printf("RG do paciente a ser atualizado: ");
+    printf(RESET);
     scanf("%s", rg);
+    limpar_buffer();
 
-    while(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
-        anterior = atual;
-        atual = atual->proximo;
+    for (int i = 0; i < lista->qntd; i++){
+        if(atual != NULL && strcmp(atual->dados->rg, rg) != 0) {
+            anterior = atual;
+            atual = atual->proximo;
+        }
     }
+    
     if(atual == NULL) {
+        printf(RED);
         printf("Erro - Paciente não encontrado.\n");
         return;
     } else {
-        printf("Atualizando dados do usuário\n");
+        printf(LIGHT_BLUE);
+        printf("\nAtualizando dados do usuário:\n\n");
         printf("Nome do paciente: ");
+        printf(RESET);
         scanf("%s", atual->dados->nome);
         limpar_buffer();
+        printf(LIGHT_BLUE);
         printf("Idade do paciente: ");
+        printf(RESET);
         scanf("%d", &atual->dados->idade);
         limpar_buffer();
+        printf(LIGHT_BLUE);
         printf("RG do paciente: ");
+        printf(RESET);
         scanf("%s", atual->dados->rg);
         limpar_buffer();
+        printf(GREEN);
         printf("\nUsuário atualizado com sucesso!");
     }
 }
@@ -134,6 +157,7 @@ void atualizar_paciente(Lista *lista) {
 void salvarLista(Lista* lista, const char* nomeArquivo) {
     FILE* arquivo = fopen(nomeArquivo, "a"); // append pra não sobrescrever
     if (arquivo == NULL) {
+        printf(RED);
         printf("Erro ao abrir o arquivo para escrita!\n");
         return;
     }
@@ -153,12 +177,14 @@ void salvarLista(Lista* lista, const char* nomeArquivo) {
     }
 
     fclose(arquivo);
-    printf("Lista salva com sucesso no arquivo %s!\n", nomeArquivo);
+    printf(GREEN);
+    printf("\nLista salva com sucesso no arquivo %s!", nomeArquivo);
 }
 
 void carregarLista(Lista* lista, const char* nomeArquivo) {
     FILE* arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
+        printf(RED);
         printf("Erro ao abrir o arquivo para leitura!\n");
         return;
     }
@@ -196,5 +222,6 @@ void carregarLista(Lista* lista, const char* nomeArquivo) {
     }
 
     fclose(arquivo);
-    printf("Lista carregada com sucesso do arquivo %s!\n", nomeArquivo);
+    printf(GREEN);
+    printf("\nLista carregada com sucesso do arquivo %s!", nomeArquivo);
 } 

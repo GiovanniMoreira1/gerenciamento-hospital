@@ -47,43 +47,67 @@ Operacao desempilhar(Pilha* pilha) {
 }
 
 void desfazer_ultima_operacao(Contexto *c) {
+    char resposta;
     Pilha* pilha = c->pilha_operacoes;
     Lista* lista = c->lista_pacientes;
     Fila* fila = c->fila_pacientes;
 
+
     if (esta_vazia(pilha)) {
-        printf("Nenhuma operação para desfazer.\n");
+        printf(RED);
+        printf("\nNenhuma operação para desfazer.\n");
         return;
     }
 
     Operacao op = desempilhar(pilha);
 
+    printf(LIGHT_BLUE);
+    printf("\n\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+    printf("| Última operação: %s\n", 
+           op.tipo == OP_CADASTRO ? "Cadastro" :
+           op.tipo == OP_REMOCAO ? "Remoção" :
+           op.tipo == OP_ENFILEIRAR ? "Enfileirar" : "Desinfileirar");
+    printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
     printf("Deseja desfazer a operação? (S/N): ");
-    char resposta;
-    scanf(" %c", &resposta);
+
     limpar_buffer();
+    printf(RESET);
+    scanf("%c", &resposta);
 
     if (resposta != 'S' && resposta != 's') {
+        printf(RED);
         printf("Operação cancelada.\n");
         return;
     }
 
     switch (op.tipo) {
         case OP_CADASTRO:
+            printf(GREEN);
             printf("Desfazendo cadastro de %s\n", op.registro.nome);
             remover_paciente(lista, op.registro.rg);
+            printf(RESET);
             break;
 
         case OP_REMOCAO:
+            printf(GREEN);
             printf("Desfazendo remoção de %s\n", op.registro.nome);
             Registro* copia = clonar_registro(&op.registro);
             cadastrar_paciente(lista, copia);
+            printf(RESET);
             break;
 
         case OP_ENFILEIRAR:
+            printf(GREEN);
             printf("Desfazendo enfileiramento de %s\n", op.registro.nome);
-            
-            printf("Operação não pode ser totalmente desfeita (limite de fila).\n");
+            desfazer_enqueue(fila);
+            printf(RESET);
+            break;
+        case OP_DESENFILEIRAR:
+            printf(GREEN);
+            printf("Desfazendo desinfileiramento de %s\n", op.registro.nome);
+            Registro* clone = clonar_registro(&op.registro);
+            desfazer_dequeue(fila, clone);
+            printf(RESET);
             break;
     }
 }
