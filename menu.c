@@ -21,7 +21,6 @@ void confirma() {
     printf("|  Pressione enter para continuar   |\n");
     printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
     printf(RESET);
-    limpar_buffer();
     fgets(input, sizeof(input), stdin);
 }
 
@@ -34,9 +33,10 @@ void sobre() {
     printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-|\n");
     printf("| Curso: Ciência da Computação - 4 Ciclo   |\n");
     printf("| Disciplina: Estrutura de Dados           |\n");
-    printf("| Data: ?                                  |\n");
+    printf("| Data: 19/05/2025                         |\n");
     printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     printf(RESET);
+    limpar_buffer();
     confirma();
 }
 
@@ -95,6 +95,7 @@ void cadastro(Lista *lista, Contexto *c) {
                 *(op.registro.entrada) = *(registro->entrada);
 
                 empilhar(c->pilha_operacoes, op);
+                limpar_buffer();
                 confirma();
                 break;
             }   
@@ -108,6 +109,7 @@ void cadastro(Lista *lista, Contexto *c) {
                 break;
             case 4:
                 atualizar_paciente(lista);
+                
                 confirma();
                 break;
             case 5: {
@@ -125,7 +127,7 @@ void cadastro(Lista *lista, Contexto *c) {
                 op.tipo = OP_REMOCAO;
                 empilhar(c->pilha_operacoes, op);
                 remover_paciente(lista, rg);
-                limpar_buffer();
+                
                 confirma();
                 break;
             }
@@ -179,16 +181,24 @@ void atendimento(Fila *fila, Lista *lista, Contexto *c) {
                     printf("\nPaciente adicionado à fila!");
                     printf(RESET);
                 }
+                limpar_buffer();
                 confirma();
                 break;
             }
             case 2:
+                if(fila->head == NULL) {
+                    printf(RED);
+                    printf("\nFila vazia!");
+                    printf(RESET);
+                    break;
+                }
+                
                 op.tipo = OP_DESENFILEIRAR;
                 op.registro = *fila->head->dados;
                 empilhar(c->pilha_operacoes, op);
-                dequeue_paciente(fila);
                 printf(GREEN);
                 printf("\nPaciente %s desenfileirado!\n", fila->head->dados->nome);
+                dequeue_paciente(fila);
                 printf(RESET);
                 confirma();
                 break;

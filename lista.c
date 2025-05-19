@@ -96,11 +96,11 @@ void remover_paciente(Lista *lista, char rg[9]) {
     } else {
         anterior->proximo = atual->proximo;
     }
+    printf(GREEN);
+    printf("Paciente %s removido com sucesso!", atual->dados->nome);
     free(atual->dados->entrada);
     free(atual->dados);
     free(atual);
-    printf(GREEN);
-    printf("Paciente %s removido com sucesso!", atual->dados->nome);
     lista->qntd--;
 }
 
